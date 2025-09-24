@@ -1,0 +1,3 @@
+C:/Users/santi/CLionProjects/DataStructuresAndAlgorithms/A01661008-Hw07-Evidence1/cmake-build-debug/CMakeFiles/A01661008_Hw07_Evidence1.dir
+C:/Users/santi/CLionProjects/DataStructuresAndAlgorithms/A01661008-Hw07-Evidence1/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/santi/CLionProjects/DataStructuresAndAlgorithms/A01661008-Hw07-Evidence1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
