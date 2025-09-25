@@ -13,24 +13,24 @@ void transform_vector_back(vector<vector<string>> &data_vector);
 vector<string> binary_search(vector<vector<string>> &data_vector, string date, int &index);
 int date_to_int(string date);
 string words_to_numeric_date(string date);
-void print_log(vector<vector<string>> &data_vector, int start, int finish);
+void print_log_and_create_txt(vector<vector<string>> &data_vector, int start, int finish, string file_name);
 string ask_user_for_date();
 
 
 int main() {
     string file = "bitacora.txt";
-    //string output_file = "results.txt";
+    string output_file = "results.txt";
     vector<vector<string>> data = create_vector_from_txt_file(file);
     merge_sort(data, 0, data.size() - 1);
 
     int starting_date_index = 0;
     int final_date_index = 0;
 
-    cout << "INITIAL DATE" << endl;
+    cout << "**INITIAL DATE**" << endl;
     string starting_date = ask_user_for_date(); //Jun 01 02:06:19 (Example)
     cout << endl;
 
-    cout << "Final DATE" << endl;
+    cout << "**FINAL DATE**" << endl;
     string final_date = ask_user_for_date(); //Jun 15 08:28:50 (Example)
     cout << endl;
 
@@ -40,7 +40,7 @@ int main() {
     cout << "-------------------------------------------------------------------" << endl;
     cout << "Logs between " << starting_date << " and " << final_date << endl;
 
-    print_log(data, starting_date_index, final_date_index);
+    print_log_and_create_txt(data, starting_date_index, final_date_index, output_file);
     cout << "-------------------------------------------------------------------" << endl;
 
 
@@ -261,19 +261,29 @@ int date_to_int(string date) {
     return stoi(result);
 }
 
-void print_log(vector<vector<string>> &data_vector, int start, int finish) {
-    transform_vector_back(data_vector);
-    int count = 0;
-    for (int i = start; i < finish + 1; i++) {
-        count = 0;
-        for (auto element : data_vector[i]) {
-            if (count > 0) {
-                cout << element << " ";
+void print_log_and_create_txt(vector<vector<string>> &data_vector, int start, int finish, string file_name) {
+    ofstream out_file(file_name);
+    string line;
+    if (out_file) {
+        transform_vector_back(data_vector);
+        int count = 0;
+        for (int i = start; i < finish + 1; i++) {
+            count = 0;
+            for (auto element: data_vector[i]) {
+                if (count > 0) {
+                    cout << element << " ";
+                    out_file << element << " ";
+                }
+                count++;
             }
-            count++;
+            out_file << endl;
+            cout << endl;
         }
-        cout << endl;
+    } else {
+        cerr << "Error: Could not open file for writing." << endl;
     }
+
+    out_file.close();
 }
 
 string words_to_numeric_date(string date) {
