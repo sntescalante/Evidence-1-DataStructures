@@ -10,35 +10,40 @@ void get_time_value(vector<vector<string>> &data_vector);
 void merge_sort(vector<vector<string>> &data_vector, int low, int high);
 void merge(vector<vector<string>> &data_vector, int low, int middle ,int high);
 void transform_vector_back(vector<vector<string>> &data_vector);
-vector<string> binary_search(vector<vector<string>> &data_vector, string date);
+vector<string> binary_search(vector<vector<string>> &data_vector, string date, int &index);
 int date_to_int(string date);
+string words_to_numeric_date(string date);
+void print_log(vector<vector<string>> &data_vector, int start, int finish);
+string ask_user_for_date();
 
 
 int main() {
     string file = "bitacora.txt";
-    string output_file = "results.txt";
+    //string output_file = "results.txt";
     vector<vector<string>> data = create_vector_from_txt_file(file);
     merge_sort(data, 0, data.size() - 1);
-    //transform_vector_back(data);
-    for (int i = 0; i < 10; i ++) {
-        int count = 0;
-        for (auto a : data[i]) {
-            if (count > 0) {
-                cout << a << " ";
-            }
-            count ++;
-        }
-        cout << endl;
-    }
 
-    vector<string> result = binary_search(data, "0601020619" );
+    int starting_date_index = 0;
+    int final_date_index = 0;
 
-    cout << "Found :";
-
-    for (auto e : result) {
-        cout << e << " ";
-    }
+    cout << "INITIAL DATE" << endl;
+    string starting_date = ask_user_for_date(); //Jun 01 02:06:19 (Example)
     cout << endl;
+
+    cout << "Final DATE" << endl;
+    string final_date = ask_user_for_date(); //Jun 15 08:28:50 (Example)
+    cout << endl;
+
+    vector<string> result1 = binary_search(data, starting_date, starting_date_index);
+    vector<string> result2 = binary_search(data, final_date, final_date_index);
+
+    cout << "-------------------------------------------------------------------" << endl;
+    cout << "Logs between " << starting_date << " and " << final_date << endl;
+
+    print_log(data, starting_date_index, final_date_index);
+    cout << "-------------------------------------------------------------------" << endl;
+
+
     return 0;
 }
 
@@ -161,8 +166,8 @@ void merge(vector<vector<string>> &data_vector, int low, int middle ,int high) {
     i = 0, j = 0, k = low;
 
     while (i < left_elements && j < right_elements) {
-        double left_n = stoi(left_side[i][0]);
-        double right_n = stoi(right_side[j][0]);
+        int left_n = stoi(left_side[i][0]);
+        int right_n = stoi(right_side[j][0]);
         if (left_n <= right_n) {
             data_vector[k] = left_side[i];
             i++;
@@ -216,17 +221,19 @@ void transform_vector_back(vector<vector<string>> &data_vector) {
 
 
 
-vector<string> binary_search(vector<vector<string>> &data_vector, string date) {
+vector<string> binary_search(vector<vector<string>> &data_vector, string date, int &index) {
     int low = 0;
     int high = data_vector.size() - 1;
     int middle = (high + low) / 2;
     vector<string> v;
+    date = words_to_numeric_date(date);
     int wanted_date = date_to_int(date);
     int int_date;
 
-    while (low < high) {
+    while (low <= high) {
         int_date = stoi(data_vector[middle][0]);
         if (wanted_date == int_date){
+            index = middle;
             return data_vector[middle];
         } else if (wanted_date < int_date) {
             high = middle;
@@ -252,4 +259,87 @@ int date_to_int(string date) {
     }
 
     return stoi(result);
+}
+
+void print_log(vector<vector<string>> &data_vector, int start, int finish) {
+    transform_vector_back(data_vector);
+    int count = 0;
+    for (int i = start; i < finish + 1; i++) {
+        count = 0;
+        for (auto element : data_vector[i]) {
+            if (count > 0) {
+                cout << element << " ";
+            }
+            count++;
+        }
+        cout << endl;
+    }
+}
+
+string words_to_numeric_date(string date) {
+    string june = "06";
+    string july = "07";
+    string august = "08";
+    string september = "09";
+    string october = "10";
+    string word_with_letters;
+    string numeric_date;
+    for (char c : date) {
+        if (c != ' ' && c != ':' && c != ';') {
+            word_with_letters += c ;
+        }
+    }
+    string month;
+    for (int i = 0; i < 3; i++) {
+        month += word_with_letters[i];
+    }
+
+    if (month == "Jun") {
+        numeric_date += june;
+    } else if (month == "Jul") {
+        numeric_date += july;
+    } else if (month == "Aug") {
+        numeric_date += august;
+    } else if (month == "Sep") {
+        numeric_date += september;
+    } else if (month == "Oct") {
+        numeric_date += october;
+    }
+
+    for (int i = 3; i < word_with_letters.size(); i++) {
+        if (isdigit(word_with_letters[i])) {
+            numeric_date += word_with_letters[i];
+        }
+    }
+    return numeric_date;
+}
+
+string ask_user_for_date() {
+
+    string answer;
+    bool valid = false;
+
+    cout << "Enter any valid date with the format [Month] [Day] [Hour]:[Minute]:[Second]" << endl;
+    cout << "Example: Jun 01 02:06:19 " << endl;
+
+    do {
+        cout << "Date: ";
+        getline(cin, answer);
+
+        int digit_count = 0;
+        string month;
+
+        for (auto c : answer) {
+            if (isdigit(c)) {
+                digit_count ++;
+            }
+        }
+        if (digit_count == 8) {
+            valid = true;
+        } else {
+            cout << "Invalid date!" << endl;
+        }
+    } while (!valid);
+
+    return answer;
 }
